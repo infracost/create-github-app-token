@@ -44488,6 +44488,11 @@ async function main(appId2, privateKey2, owner2, repositories2, permissions2, co
   core3.info("Validating token...");
   await validateToken(request2, authentication.token, core3);
   core3.info("Token is valid.");
+  if (parsedRepositoryNames.length > 0) {
+    core3.info("Validating repository access...");
+    await validateRepositoryAccess(request2, authentication.token, parsedOwner, parsedRepositoryNames, core3);
+    core3.info("All repositories are accessible.");
+  }
   core3.setSecret(authentication.token);
   core3.setOutput("token", authentication.token);
   core3.setOutput("installation-id", installationId);
@@ -44514,6 +44519,27 @@ async function validateToken(request2, token, core3) {
       }
     }
   );
+}
+async function validateRepositoryAccess(request2, token, owner2, repositories2, core3) {
+  for (const repo of repositories2) {
+    await pRetry(
+      async () => {
+        await request2("GET /repos/{owner}/{repo}", {
+          owner: owner2,
+          repo,
+          headers: { authorization: `token ${token}` }
+        });
+      },
+      {
+        retries: 5,
+        onFailedAttempt: (error) => {
+          core3.info(
+            `Repository access validation failed for ${owner2}/${repo} (attempt ${error.attemptNumber}): ${error.message}`
+          );
+        }
+      }
+    );
+  }
 }
 async function getTokenFromOwner(request2, auth5, parsedOwner, permissions2) {
   const response = await request2("GET /users/{username}/installation", {

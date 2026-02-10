@@ -123,6 +123,46 @@ export async function test(cb = (_mockPool) => {}, env = DEFAULT_ENV) {
       { headers: { "content-type": "application/json" } }
     );
 
+  // Mock repository access validation requests
+  const inputRepos = (process.env.INPUT_REPOSITORIES || "")
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter((x) => x !== "");
+  const inputOwner = process.env.INPUT_OWNER || "";
+
+  let repoNamesToMock = [];
+  let ownerToMock = "";
+
+  if (!inputOwner && inputRepos.length === 0) {
+    const [defaultOwner, defaultRepo] = String(process.env.GITHUB_REPOSITORY).split("/");
+    repoNamesToMock = [defaultRepo];
+    ownerToMock = defaultOwner;
+  } else if (inputOwner && inputRepos.length === 0) {
+    repoNamesToMock = [];
+    ownerToMock = inputOwner;
+  } else {
+    repoNamesToMock = inputRepos;
+    ownerToMock = inputOwner || String(process.env.GITHUB_REPOSITORY_OWNER);
+  }
+
+  for (const repoName of repoNamesToMock) {
+    mockPool
+      .intercept({
+        path: `${basePath}/repos/${ownerToMock}/${encodeURIComponent(repoName)}`,
+        method: "GET",
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          "user-agent": "actions/create-github-app-token",
+          authorization: `token ${mockInstallationAccessToken}`,
+        },
+      })
+      .reply(
+        200,
+        { id: 1, name: repoName },
+        { headers: { "content-type": "application/json" } }
+      );
+  }
+
   // Run the main script
   const { default: promise } = await import("../main.js");
   await promise;
