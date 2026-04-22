@@ -4,6 +4,10 @@ app-id — Use 'client-id' instead.
 
 exports[`main-app-id-fallback.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -17,10 +21,16 @@ Inputs 'owner' and 'repositories' are not set. Creating token for this repositor
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-client-id-precedence.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -34,12 +44,18 @@ Inputs 'owner' and 'repositories' are not set. Creating token for this repositor
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-custom-github-api-url.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
       
 - actions/create-github-app-token
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -53,6 +69,8 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 GET /api/v3/repos/actions/create-github-app-token/installation
 POST /api/v3/app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /api/v3/installation/repositories
+GET /api/v3/repos/actions/create-github-app-token
 `;
 
 exports[`main-missing-client-and-app-id.test.js > stderr 1`] = `
@@ -73,6 +91,10 @@ GITHUB_REPOSITORY missing, must be set to '<owner>/<repo>'
 
 exports[`main-private-key-with-escaped-newlines.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -86,6 +108,8 @@ Inputs 'owner' and 'repositories' are not set. Creating token for this repositor
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-proxy-requires-native-support.test.js > stderr 1`] = `
@@ -94,6 +118,58 @@ A proxy environment variable is set, but Node.js native proxy support is not ena
 
 exports[`main-proxy-requires-native-support.test.js > stdout 1`] = `
 ::error::A proxy environment variable is set, but Node.js native proxy support is not enabled. Set NODE_USE_ENV_PROXY=1 for this action step.
+`;
+
+exports[`main-repo-access-validation-retry.test.js > stdout 1`] = `
+Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+Repository access validation failed for actions/create-github-app-token (attempt 1): undefined
+All repositories are accessible.
+::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=installation-id::123456
+
+::set-output name=app-slug::github-actions
+::save-state name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+::save-state name=expiresAt::2016-07-11T22:14:10Z
+--- REQUESTS ---
+GET /repos/actions/create-github-app-token/installation
+POST /app/installations/123456/access_tokens
+{"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+GET /repos/actions/create-github-app-token
+`;
+
+exports[`main-repo-access-validation.test.js > stdout 1`] = `
+Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
+      
+- actions/create-github-app-token
+- actions/toolkit
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
+::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=installation-id::123456
+
+::set-output name=app-slug::github-actions
+::save-state name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+::save-state name=expiresAt::2016-07-11T22:14:10Z
+--- REQUESTS ---
+GET /repos/actions/create-github-app-token/installation
+POST /app/installations/123456/access_tokens
+{"repositories":["create-github-app-token","toolkit"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+GET /repos/actions/toolkit
 `;
 
 exports[`main-repo-skew.test.js > stderr 1`] = `
@@ -105,6 +181,10 @@ exports[`main-repo-skew.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
       
 - actions/failed-repo
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -119,11 +199,15 @@ GET /repos/actions/failed-repo/installation
 GET /repos/actions/failed-repo/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["failed-repo"]}
+GET /installation/repositories
+GET /repos/actions/failed-repo
 `;
 
 exports[`main-token-get-owner-set-fail-response.test.js > stdout 1`] = `
 Input 'repositories' is not set. Creating token for all repositories owned by smockle.
 Failed to create token for "smockle" (attempt 1): GitHub API not available
+Validating token...
+Token is valid.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -138,6 +222,7 @@ GET /users/smockle/installation
 GET /users/smockle/installation
 POST /app/installations/123456/access_tokens
 null
+GET /installation/repositories
 `;
 
 exports[`main-token-get-owner-set-repo-fail-response.test.js > stdout 1`] = `
@@ -145,6 +230,10 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
       
 - actions/failed-repo
 Failed to create token for "failed-repo" (attempt 1): GitHub API not available
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -159,6 +248,8 @@ GET /repos/actions/failed-repo/installation
 GET /repos/actions/failed-repo/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["failed-repo"]}
+GET /installation/repositories
+GET /repos/actions/failed-repo
 `;
 
 exports[`main-token-get-owner-set-repo-set-to-many-newline.test.js > stdout 1`] = `
@@ -167,6 +258,10 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 - actions/create-github-app-token
 - actions/toolkit
 - actions/checkout
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -180,6 +275,10 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token","toolkit","checkout"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+GET /repos/actions/toolkit
+GET /repos/actions/checkout
 `;
 
 exports[`main-token-get-owner-set-repo-set-to-many.test.js > stdout 1`] = `
@@ -188,6 +287,10 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 - actions/create-github-app-token
 - actions/toolkit
 - actions/checkout
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -201,12 +304,20 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token","toolkit","checkout"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+GET /repos/actions/toolkit
+GET /repos/actions/checkout
 `;
 
 exports[`main-token-get-owner-set-repo-set-to-one.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
       
 - actions/create-github-app-token
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -220,10 +331,14 @@ Inputs 'owner' and 'repositories' are set. Creating token for the following repo
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-token-get-owner-set-repo-unset.test.js > stdout 1`] = `
 Input 'repositories' is not set. Creating token for all repositories owned by actions.
+Validating token...
+Token is valid.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -237,11 +352,16 @@ Input 'repositories' is not set. Creating token for all repositories owned by ac
 GET /users/actions/installation
 POST /app/installations/123456/access_tokens
 null
+GET /installation/repositories
 `;
 
 exports[`main-token-get-owner-unset-repo-set.test.js > stdout 1`] = `
 No 'owner' input provided. Using default owner 'actions' to create token for the following repositories:
 - actions/create-github-app-token
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -255,10 +375,16 @@ No 'owner' input provided. Using default owner 'actions' to create token for the
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-token-get-owner-unset-repo-unset.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -272,10 +398,16 @@ Inputs 'owner' and 'repositories' are not set. Creating token for this repositor
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`main-token-permissions-set.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
 ::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -289,6 +421,56 @@ Inputs 'owner' and 'repositories' are not set. Creating token for this repositor
 GET /repos/actions/create-github-app-token/installation
 POST /app/installations/123456/access_tokens
 {"repositories":["create-github-app-token"],"permissions":{"issues":"write","pull_requests":"read"}}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+`;
+
+exports[`main-token-validation-retry.test.js > stdout 1`] = `
+Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token validation failed (attempt 1): undefined
+Token is valid.
+Validating repository access...
+All repositories are accessible.
+::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=installation-id::123456
+
+::set-output name=app-slug::github-actions
+::save-state name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+::save-state name=expiresAt::2016-07-11T22:14:10Z
+--- REQUESTS ---
+GET /repos/actions/create-github-app-token/installation
+POST /app/installations/123456/access_tokens
+{"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
+`;
+
+exports[`main-token-validation.test.js > stdout 1`] = `
+Inputs 'owner' and 'repositories' are not set. Creating token for this repository (actions/create-github-app-token).
+Validating token...
+Token is valid.
+Validating repository access...
+All repositories are accessible.
+::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=installation-id::123456
+
+::set-output name=app-slug::github-actions
+::save-state name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+::save-state name=expiresAt::2016-07-11T22:14:10Z
+--- REQUESTS ---
+GET /repos/actions/create-github-app-token/installation
+POST /app/installations/123456/access_tokens
+{"repositories":["create-github-app-token"]}
+GET /installation/repositories
+GET /repos/actions/create-github-app-token
 `;
 
 exports[`post-proxy-requires-native-support.test.js > stderr 1`] = `
